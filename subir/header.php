@@ -173,7 +173,7 @@ if (isset($_SESSION['nomeUsuario'])) {
                                 </a>
                             </li>
                             <li>
-                            <a href="consultar_usuario.php">
+                            <a href="#">
                                 <span class="sub-item">Consultar Usuario</span>
                             </a>
                         </li>
