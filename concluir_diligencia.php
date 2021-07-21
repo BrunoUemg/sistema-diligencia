@@ -24,7 +24,7 @@ $senhaValidacao = $con->escape_string($_POST['senhaValidacao']);
 if(password_verify($senhaValidacao,$senha_db)){
         
     $con->query("UPDATE diligencia set situacao = 1 where idDiligencia = '$idDiligencia'");
-    $con->query("INSERT INTO historico_diligencia (dataAlteracao,horaAlteracao,situacao,idUsuario, idDiligencia)VALUES('$data_hoje', '$hora', 'Concluído', '$idUsuario', '$idDiligencia')");
+    $con->query("INSERT INTO historico_diligencia (dataAlteracao,horaAlteracao,situacao,idUsuario, idDiligencia)VALUES('$data_hoje', '$hora', 'Encaminhado para a conclusão', '$idUsuario', '$idDiligencia')");
     
     if($linha_usuario['acesso'] == 1){
         echo "<script>alert('Concluído com sucesso!');window.location='diligencia_gm.php'</script>";

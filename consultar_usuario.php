@@ -7,7 +7,7 @@ include_once "dao/conexao.php";
 
 
 
-$result_consultaUsuario = "SELECT *  FROM Usuario where acesso !=1 ";
+$result_consultaUsuario = "SELECT *  FROM usuario where acesso !=1 ";
 $resultado_consultaUsuario = mysqli_query($con, $result_consultaUsuario);
 
 ?>

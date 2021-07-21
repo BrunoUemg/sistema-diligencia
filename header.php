@@ -202,11 +202,7 @@ if (isset($_SESSION['nomeUsuario'])) {
                                     <span class="sub-item">Encaminhar diligência</span>
                                 </a>
                             </li>
-                                <li>
-                                <a href="diligencia_pendente.php">
-                                    <span class="sub-item">Diligencia pendente</span>
-                                </a>
-                            </li>
+                               
                                 <li>
                                 <a href="consultar_diligencia.php">
                                     <span class="sub-item">Consultar diligencia</span>
@@ -257,11 +253,7 @@ if (isset($_SESSION['nomeUsuario'])) {
                                     <span class="sub-item">Encaminhar diligência</span>
                                 </a>
                             </li>
-                                <li>
-                                <a href="diligencia_pendente.php">
-                                    <span class="sub-item">Diligencia pendente</span>
-                                </a>
-                            </li>
+                                
                                    
                                 <li>
                                 <a href="consultar_diligencia.php">

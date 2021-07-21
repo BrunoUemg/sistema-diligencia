@@ -4,10 +4,40 @@ include_once "header.php";
 include_once "dao/conexao.php";
 
 
+setlocale(LC_TIME, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
+date_default_timezone_set('America/Sao_Paulo');
+
+$data_hoje = date("Y-m-d");
+$hora = date("H:i:s");
+
+if(isset($_GET['idDiligencia']) && !isset($_GET['idCriador'])){
+
+    $idDiligencia = $_GET['idDiligencia'];
 
 
+$con->query("UPDATE diligencia SET situacao = 2 where idDiligencia = '$idDiligencia'");
+$con->query("INSERT INTO historico_diligencia (dataAlteracao, horaAlteracao, situacao, idUsuario, idDiligencia)
+VALUES('$data_hoje', '$hora', '$_SESSION[nomeUsuario] deu ciência dessa diligência', '$_SESSION[idUsuario]', '$idDiligencia')");
 
-$result_consultaDiligencia = "SELECT *  FROM diligencia D INNER JOIN usuario U ON D.idUsuario = U.idUsuario where situacao = 2 and D.idUsuario = $_SESSION[idUsuario]  ";
+
+}
+if(isset($_GET['idDiligencia']) && isset($_GET['idCriador'])){
+    $idDiligencia = $_GET['idDiligencia'];
+    $idCriador = $_GET['idCriador'];
+    $con->query("UPDATE diligencia SET situacao = 0 where idDiligencia = '$idDiligencia'");
+$con->query("INSERT INTO historico_diligencia (dataAlteracao, horaAlteracao, situacao, idUsuario, idDiligencia)
+VALUES('$data_hoje', '$hora', '$_SESSION[nomeUsuario] finalizou diligência', '$_SESSION[idUsuario]', '$idDiligencia')");
+}
+if(isset($_POST['situacao'])){
+    $idDiligencia = $_POST['idDiligencia'];
+    $situacao = $_POST['situacao'];
+    $con->query("UPDATE diligencia SET situacao = 3 where idDiligencia = '$idDiligencia'");
+$con->query("INSERT INTO historico_diligencia (dataAlteracao, horaAlteracao, situacao, idUsuario, idDiligencia)
+VALUES('$data_hoje', '$hora', '$situacao', '$_SESSION[idUsuario]', '$idDiligencia')");
+}
+
+
+$result_consultaDiligencia = "SELECT *  FROM diligencia D INNER JOIN usuario U ON D.idUsuario = U.idUsuario where  D.situacao != 0 ";
 $resultado_consultaDiligencia = mysqli_query($con, $result_consultaDiligencia);
 
 ?>
@@ -34,7 +64,7 @@ $resultado_consultaDiligencia = mysqli_query($con, $result_consultaDiligencia);
 
 
             <div class="card-body">
-            <center><h3>Encaminhar diligência ao eminente</h3></center>
+            <center><h3>Consultar diligência</h3></center>
            
               <div class="table-responsive">
                 <table id="basic-datatables" class="display table table-striped table-hover">
@@ -44,6 +74,7 @@ $resultado_consultaDiligencia = mysqli_query($con, $result_consultaDiligencia);
                       <th>Descrição</th>
                       <th>Prazo para entregar</th>
                       <th>Prioridade</th>
+                      <th>Criador</th>
                       <th>GM</th>
                         <th>Situação</th>
                       <th>Informação</th>
@@ -70,7 +101,7 @@ $resultado_consultaDiligencia = mysqli_query($con, $result_consultaDiligencia);
                         $select_Recente_historico = mysqli_query($con,"SELECT H.horaAlteracao, H.dataAlteracao, H.situacao, U.nomeUsuario  from historico_diligencia H 
                         INNER JOIN usuario U ON U.idUsuario = H.idUsuario WHERE idHistorico_diligencia = '$idHistorico_diligencia'");
                         $result2 = mysqli_fetch_array($select_Recente_historico);
-                      
+                        if($rows_diligencia['idUsuario'] == $_SESSION['idUsuario'] || $rows_diligencia['idCriador'] == $_SESSION['idUsuario']){
 
                       ?>
                       <tr>
@@ -81,6 +112,12 @@ $resultado_consultaDiligencia = mysqli_query($con, $result_consultaDiligencia);
                         echo $data; ?></td>
                         <td><?php echo $rows_diligencia['prioridade']; ?></td>
                        
+                      <td> <?php $select_usuario = "SELECT * FROM usuario where idUsuario = '$rows_diligencia[idCriador]'";
+                              $res = $con->query($select_usuario);
+                              $linha_usuario = $res->fetch_assoc();
+                              echo $linha_usuario['nomeUsuario'];
+                        ?></td>
+                        
 
                         <td><?php echo $rows_diligencia['nomeUsuario']; ?></td>
                         <td><?php 
@@ -93,8 +130,17 @@ $resultado_consultaDiligencia = mysqli_query($con, $result_consultaDiligencia);
                         <td>
                         <?php echo "<a class='btn btn-default' title='Informações sobre'  href='consultar_administrativo.php?id=" . $rows_diligencia['idDiligencia'] . "' data-toggle='modal' data-target='#ModalInfo" . $rows_diligencia['idDiligencia'] . "'>" ?><i class="fas fa-info"></i><?php echo "</a>"; ?>
                         
-                        <?php echo "<a class='btn btn-default' title='Concluir'  href='consultar_administrativo.php?id=" . $rows_diligencia['idDiligencia'] . "' data-toggle='modal' data-target='#ModalConcluir" . $rows_diligencia['idDiligencia'] . "'>" ?><i class="fas fa-check"></i><?php echo "</a>"; ?>
                         
+                        <?php  if($rows_diligencia['situacao'] == 1 && $rows_diligencia['idCriador'] == $_SESSION['idUsuario']){ ?>
+                        <?php  echo "<a  class='btn btn-default' title='Finalizar' href='consultar_diligencia.php?idDiligencia=" .$rows_diligencia['idDiligencia'].'&idCriador='.$rows_diligencia['idCriador']."' onclick=\"return confirm('Essa diligência sera finalizada e não poderá mais ser alterada, confirma essa ação?');\">"?>Concluir<?php echo "</a>";  ?>
+                        <?php echo "<a class='btn btn-default' title='Retornar'  href='consultar_diligencia.php?id=" . $rows_diligencia['idDiligencia'] . "' data-toggle='modal' data-target='#ModalReturn" . $rows_diligencia['idDiligencia'] . "'>" ?><i class="fas fa-undo-alt"></i><?php echo "</a>"; }?>
+
+                        <?php  if($rows_diligencia['situacao'] == 2){ ?>
+                        <?php echo "<a class='btn btn-default' title='Concluir'  href='consultar_administrativo.php?id=" . $rows_diligencia['idDiligencia'] . "' data-toggle='modal' data-target='#ModalConcluir" . $rows_diligencia['idDiligencia'] . "'>" ?><i class="fas fa-check"></i><?php echo "</a>"; } ?>
+
+                        <?php   if($rows_diligencia['situacao'] == 3 && $rows_diligencia['idUsuario'] == $_SESSION['idUsuario']){  ?>
+                        <?php  echo "<a  class='btn btn-default' title='Ciência' href='consultar_diligencia.php?idDiligencia=" .$rows_diligencia['idDiligencia']. "' onclick=\"return confirm('Dar ciência desse registro?');\">"?>Ciência<?php echo "</a>"; } ?>
+                       
 
                       
                       
@@ -147,7 +193,7 @@ $resultado_consultaDiligencia = mysqli_query($con, $result_consultaDiligencia);
 
 
                                   <label for="">Situação</label>
-                                    <select name="situacao" class="form-control" id="">
+                                    <select name="situacao" required class="form-control" id="">
                                     <option value="">Selecione</option>
                                     <option value="Pendente">Pendente</option>
                                     <option value="Em andamento">Em andamento</option>
@@ -201,12 +247,51 @@ $resultado_consultaDiligencia = mysqli_query($con, $result_consultaDiligencia);
                           </div>
                         </td>
 
+                        <div class="modal fade" id="ModalReturn<?php echo $rows_diligencia['idDiligencia']; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLabel">Informações da diligência</h5>
+                                  <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body">
+                                <form action="" method="POST">
+
+                                   
+                              
+                                    <input type="text" readonly hidden class="form-control" required name="idDiligencia" value="<?php echo $rows_diligencia['idDiligencia']; ?>">
+                                    
+                                  <label for="">Motivo do retorno</label>
+                                  <textarea name="situacao" class="form-control" id="" cols="30" rows="10"></textarea>
+
+                                    
+
+
+                                
+                           
+                               
+                                 
+
+                                </div>
+                                <div class="modal-footer">
+                                  <button class="btn btn-danger" type="button" data-dismiss="modal">Cancelar</button>
+                                  <input type="submit" name="enviar" class="btn btn-success" value="Retornar">
+                                  </form>
+
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
 
                       
 
                         
                       </tr>
-                    <?php   } ?>
+                    <?php   } } ?>
                   </tbody>
                 </table>
               </div>

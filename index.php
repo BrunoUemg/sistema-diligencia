@@ -38,11 +38,11 @@ ul li a{
             <div class="card-header">
             <h4>Diligência recebida pelo eminente</h4>
             <div class="alert alert-primary" role="alert">
-            <p>Possui <?php echo $linha['cont'];?> diligência pendente</p>
+            <a href="consultar_diligencia.php"><p>Possui <?php echo $linha['cont'];?> diligência pendente</p></a>
             </div>
             <h4>Diligência para finalizar </h4>
             <div class="alert alert-primary" role="alert">
-            <p>Possui <?php echo $linha2['cont'];?> diligência pendente para finalizar</p>
+            <a href="consultar_diligencia.php"><p>Possui <?php echo $linha2['cont'];?> diligência pendente para finalizar </p></a>
             </div>
             </div>
             </div>

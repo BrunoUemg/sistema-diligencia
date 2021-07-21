@@ -108,7 +108,7 @@ $resultado_diligencia = mysqli_query($con, $sql4);
   $dompdf->render();
   
   // Output the generated PDF to Browser
-  $dompdf->stream('Histórico de diligencia do jovem.pdf',
+  $dompdf->stream('Histórico de diligencia.pdf',
   array ("Attachment" =>true //para realizar o download somente alterar para true
   )
   );
