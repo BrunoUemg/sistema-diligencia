@@ -35,6 +35,7 @@ $linha = $res->fetch_assoc();
 		$_SESSION['idJovem'] = $idJovem;
         $_SESSION['userAcesso'] = $user;
         $_SESSION['acesso'] = $acesso;
+        $_SESSION['diligencia'] = true;
 
 	header('location: ../index.php');
     }

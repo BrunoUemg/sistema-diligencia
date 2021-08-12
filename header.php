@@ -1,7 +1,7 @@
 <?php
 include_once "dao/conexao.php";
 session_start();
-if (isset($_SESSION['nomeUsuario'])) {
+if (isset($_SESSION['diligencia'])) {
     //login ok!
 } else {
     header('location: ./login.php');
